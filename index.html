@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-M">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Mundo das Tintas: Uma Exploração Interativa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .active-nav {
+            color: #A37A5B;
+            font-weight: 700;
+            border-bottom: 2px solid #A37A5B;
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover {
+            color: #A37A5B;
+        }
+        .card-component, .card-type, .step-box, .card-brand {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card-component:hover, .card-type:hover, .step-box:hover, .card-brand:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .active-step {
+            background-color: #A37A5B !important;
+            color: #FFFFFF !important;
+            border-color: #8C664C !important;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-[#A37A5B]">Mundo das Tintas</h1>
+            <div class="hidden md:flex space-x-6 lg:space-x-8">
+                <a href="#ingredientes" class="nav-link">Ingredientes</a>
+                <a href="#processo" class="nav-link">Processo</a>
+                <a href="#tipos" class="nav-link">Tipos de Tinta</a>
+                <a href="#marcas" class="nav-link">Marcas</a>
+            </div>
+             <button id="mobile-menu-button" class="md:hidden text-2xl">☰</button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white px-6 pb-4">
+             <a href="#ingredientes" class="block py-2 nav-link">Ingredientes</a>
+             <a href="#processo" class="block py-2 nav-link">Processo</a>
+             <a href="#tipos" class="block py-2 nav-link">Tipos de Tinta</a>
+             <a href="#marcas" class="block py-2 nav-link">Marcas</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        
+        <section id="intro" class="text-center mb-20">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-800">Uma Pincelada no Universo das Tintas</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600">
+                As tintas são muito mais do que simples cores. São revestimentos complexos que protegem, decoram e transformam o mundo à nossa volta. Esta aplicação interativa desvenda os segredos por trás de cada lata de tinta, desde os seus componentes fundamentais, passando pelo seu processo de fabrico, até às marcas que pintam o Brasil. Explore e descubra a ciência e a história por trás das cores.
+            </p>
+        </section>
+        
+        <section id="ingredientes" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Os Ingredientes Essenciais</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-gray-600">Toda a tinta é uma mistura equilibrada de quatro componentes chave. Clique em cada um para descobrir a sua função vital. O gráfico representa uma composição típica, mostrando como cada parte contribui para o todo.</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="w-full lg:w-1/2">
+                     <div class="chart-container">
+                        <canvas id="paintCompositionChart"></canvas>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div id="comp-pigmentos" class="card-component cursor-pointer p-4 bg-white rounded-lg shadow-md border-l-4 border-[#E57373]">
+                            <h3 class="font-bold text-lg">Pigmentos</h3>
+                            <p class="text-sm text-gray-500">Dão a cor e a opacidade.</p>
+                        </div>
+                        <div id="comp-aglutinantes" class="card-component cursor-pointer p-4 bg-white rounded-lg shadow-md border-l-4 border-[#81C784]">
+                            <h3 class="font-bold text-lg">Aglutinantes</h3>
+                            <p class="text-sm text-gray-500">A "cola" que forma a película.</p>
+                        </div>
+                        <div id="comp-solventes" class="card-component cursor-pointer p-4 bg-white rounded-lg shadow-md border-l-4 border-[#64B5F6]">
+                            <h3 class="font-bold text-lg">Solventes</h3>
+                            <p class="text-sm text-gray-500">Ajustam a viscosidade.</p>
+                        </div>
+                        <div id="comp-aditivos" class="card-component cursor-pointer p-4 bg-white rounded-lg shadow-md border-l-4 border-[#FFD54F]">
+                            <h3 class="font-bold text-lg">Aditivos</h3>
+                            <p class="text-sm text-gray-500">Melhoram propriedades.</p>
+                        </div>
+                    </div>
+                    <div id="component-details" class="mt-6 p-6 bg-white rounded-lg shadow-inner min-h-[200px] fade-in">
+                        <p class="text-gray-500 italic">Clique num componente acima para ver os detalhes.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="processo" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">O Processo de Fabrico</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-gray-600">A transformação de matérias-primas em tinta segue um processo cuidadoso e controlado. Clique em cada etapa do fluxograma para entender o que acontece em cada fase da produção.</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <div class="w-full md:w-1/3 flex flex-col items-center space-y-2">
+                    <div id="step-1" class="step-box w-full text-center p-3 border-2 border-gray-300 rounded-lg bg-white cursor-pointer">1. Pesagem e Pré-mistura</div>
+                    <div class="text-2xl text-gray-400">↓</div>
+                    <div id="step-2" class="step-box w-full text-center p-3 border-2 border-gray-300 rounded-lg bg-white cursor-pointer">2. Dispersão (Moagem)</div>
+                    <div class="text-2xl text-gray-400">↓</div>
+                    <div id="step-3" class="step-box w-full text-center p-3 border-2 border-gray-300 rounded-lg bg-white cursor-pointer">3. Completação</div>
+                    <div class="text-2xl text-gray-400">↓</div>
+                    <div id="step-4" class="step-box w-full text-center p-3 border-2 border-gray-300 rounded-lg bg-white cursor-pointer">4. Controlo de Qualidade</div>
+                    <div class="text-2xl text-gray-400">↓</div>
+                    <div id="step-5" class="step-box w-full text-center p-3 border-2 border-gray-300 rounded-lg bg-white cursor-pointer">5. Filtração</div>
+                    <div class="text-2xl text-gray-400">↓</div>
+                    <div id="step-6" class="step-box w-full text-center p-3 border-2 border-gray-300 rounded-lg bg-white cursor-pointer">6. Embalagem</div>
+                </div>
+
+                <div class="w-full md:w-2/3 p-6 bg-white rounded-lg shadow-inner min-h-[300px] fade-in" id="process-details">
+                     <p class="text-gray-500 italic">Clique numa etapa à esquerda para ver a descrição.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="tipos" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Tipos Comuns de Tinta</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-gray-600">As tintas variam muito dependendo da sua base química e aplicação. Conheça alguns dos tipos mais comuns utilizados no nosso dia a dia e na indústria.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="card-type bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-xl mb-2 text-[#64B5F6]">À Base de Água</h3>
+                    <p class="text-gray-600">Também conhecidas como látex ou acrílicas. Usam água como solvente, têm baixo odor e são de fácil limpeza. Ideais para interiores e exteriores.</p>
+                </div>
+                <div class="card-type bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-xl mb-2 text-[#FFB74D]">À Base de Solvente</h3>
+                    <p class="text-gray-600">Também conhecidas como tintas a óleo. Oferecem alta durabilidade e um acabamento liso. Usadas em superfícies que exigem maior resistência.</p>
+                </div>
+                <div class="card-type bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-xl mb-2 text-[#BA68C8]">Epóxi e Poliuretano</h3>
+                    <p class="text-gray-600">Tintas de dois componentes de altíssima resistência química e à abrasão. Comuns em pisos de garagens, indústrias e quadras desportivas.</p>
+                </div>
+                <div class="card-type bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-xl mb-2 text-[#A1887F]">Vernizes</h3>
+                    <p class="text-gray-600">Tintas transparentes ou translúcidas que não possuem pigmentos de cor. Usadas para proteger e realçar a beleza natural da madeira.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="marcas" class="scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Principais Marcas e Suas Histórias</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-gray-600">O mercado brasileiro de tintas é rico em história e inovação. Conheça algumas das marcas que se destacam e colorem o país há décadas, cada uma com sua trajetória única.</p>
+            </div>
+            <div id="brands-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-100 mt-20">
+        <div class="container mx-auto px-6 py-4 text-center text-gray-500">
+            <p>&copy; 2024 Exploração Interativa de Tintas. Conteúdo adaptado para fins educacionais.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const contentData = {
+                components: {
+                    pigmentos: {
+                        title: "Pigmentos: A Alma da Cor",
+                        description: "Fornecem cor, opacidade e, em alguns casos, propriedades protetoras como a inibição da corrosão. Podem ser orgânicos para cores vibrantes ou inorgânicos (como dióxido de titânio) para maior durabilidade."
+                    },
+                    aglutinantes: {
+                        title: "Aglutinantes: A Estrutura da Tinta",
+                        description: "Também conhecidos como resinas, são o componente que 'liga' os pigmentos e os fixa à superfície, formando a película de tinta. Determinam a adesão, durabilidade e resistência da tinta (ex: acrílicas, epóxis)."
+                    },
+                    solventes: {
+                        title: "Solventes: O Veículo",
+                        description: "Ajustam a viscosidade da tinta para facilitar a aplicação. Evaporam durante a secagem. O principal exemplo é a água (em tintas à base de água) ou solventes orgânicos (em tintas à base de óleo)."
+                    },
+                    aditivos: {
+                        title: "Aditivos: Os Especialistas",
+                        description: "São adicionados em pequenas quantidades para melhorar propriedades específicas, como acelerar a secagem (secantes), evitar bolhas (antiespumantes) ou proteger contra fungos (fungicidas)."
+                    }
+                },
+                process: {
+                    "step-1": {
+                        title: "1. Pesagem e Pré-mistura",
+                        description: "As matérias-primas são pesadas com precisão e misturadas para criar uma pasta base homogénea. Esta é a fase de formulação, onde a 'receita' da tinta começa a tomar forma."
+                    },
+                    "step-2": {
+                        title: "2. Dispersão (Moagem)",
+                        description: "Etapa crucial onde a pasta é processada em moinhos para quebrar aglomerados de pigmentos. O objetivo é garantir que cada partícula de pigmento seja completamente 'molhada' pelo aglutinante, garantindo cor e desempenho."
+                    },
+                    "step-3": {
+                        title: "3. Completação (Let-down)",
+                        description: "A pasta concentrada é transferida para um tanque maior, onde o restante do aglutinante, solventes e aditivos finais são adicionados e misturados lentamente até atingir as propriedades desejadas."
+                    },
+                    "step-4": {
+                        title: "4. Ajustes e Controlo de Qualidade",
+                        description: "Amostras são testadas para verificar cor, viscosidade, brilho e outros parâmetros. Pequenos ajustes são feitos para garantir que o lote atenda rigorosamente às especificações."
+                    },
+                    "step-5": {
+                        title: "5. Filtração",
+                        description: "Antes de embalar, a tinta finalizada é passada por filtros para remover quaisquer impurezas ou partículas que possam ter permanecido no processo, garantindo um acabamento perfeito."
+                    },
+                    "step-6": {
+                        title: "6. Embalagem (Enchimento)",
+                        description: "A tinta aprovada é envasada em latas ou baldes, rotulada e preparada para ser distribuída. A tinta está agora pronta para colorir e proteger o mundo."
+                    }
+                },
+                brands: [
+                    {
+                        name: "Suvinil",
+                        logoColor: "border-green-500",
+                        history: "Fundada em 1961, a Suvinil faz parte do grupo alemão BASF. É uma das marcas mais tradicionais e conhecidas no Brasil, com forte investimento em inovação, cores e produtos para diversas superfícies. Tornou-se referência em tintas imobiliárias, oferecendo um vasto leque de cores e soluções."
+                    },
+                    {
+                        name: "Coral",
+                        logoColor: "border-blue-500",
+                        history: "Com origem na Argentina em 1954 e chegando ao Brasil em 1970, a Coral pertence ao grupo holandês AkzoNobel (também detentor da marca Ypiranga). É reconhecida pela sua ampla gama de produtos, inovação em cores (como o 'ColourFutures') e forte presença no mercado de tintas decorativas."
+                    },
+                    {
+                        name: "Sherwin-Williams",
+                        logoColor: "border-red-600",
+                        history: "Uma gigante global fundada nos EUA em 1866, a Sherwin-Williams tem uma presença consolidada no Brasil, atuando nos segmentos imobiliário, industrial e automotivo. Adquiriu marcas locais como a Colorgin (sprays) e Metalatex, expandindo sua atuação e portfólio no país."
+                    },
+                    {
+                        name: "Lukscolor",
+                        logoColor: "border-yellow-500",
+                        history: "Marca brasileira do grupo Luksnova, fundada em 1989. A Lukscolor se destaca pela qualidade e tecnologia em seus produtos, com foco no segmento premium de tintas imobiliárias. Investe em pesquisa para oferecer tintas com alto desempenho e durabilidade."
+                    },
+                    {
+                        name: "Tintas Iquine",
+                        logoColor: "border-orange-500",
+                        history: "Fundada em Pernambuco em 1974, a Iquine é uma das maiores indústrias de tintas do Brasil com capital 100% nacional. Possui um portfólio diversificado, atendendo aos segmentos imobiliário, industrial e de repintura automotiva, com forte presença no Nordeste e expansão para outras regiões."
+                    },
+                    {
+                        name: "Futura Tintas",
+                        logoColor: "border-purple-500",
+                        history: "Fundada em 1981, a Futura Tintas é uma empresa brasileira que cresceu significativamente, focando em tintas imobiliárias e industriais. Conhecida por seu programa de relacionamento com pintores e investimento em capacitação profissional no setor."
+                    }
+                ]
+            };
+            
+            const componentDetailsContainer = document.getElementById('component-details');
+            const componentCards = document.querySelectorAll('.card-component');
+
+            componentCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const componentId = card.id.split('-')[1];
+                    const data = contentData.components[componentId];
+                    componentDetailsContainer.innerHTML = `
+                        <h4 class="font-bold text-xl mb-2">${data.title}</h4>
+                        <p class="text-gray-600">${data.description}</p>
+                    `;
+                    componentDetailsContainer.classList.add('fade-in');
+                    setTimeout(() => componentDetailsContainer.classList.remove('fade-in'), 500);
+                });
+            });
+
+            const processDetailsContainer = document.getElementById('process-details');
+            const stepBoxes = document.querySelectorAll('.step-box');
+
+            stepBoxes.forEach(box => {
+                box.addEventListener('click', () => {
+                    stepBoxes.forEach(b => b.classList.remove('active-step'));
+                    box.classList.add('active-step');
+
+                    const stepId = box.id;
+                    const data = contentData.process[stepId];
+                    processDetailsContainer.innerHTML = `
+                        <h4 class="font-bold text-xl mb-2">${data.title}</h4>
+                        <p class="text-gray-600">${data.description}</p>
+                    `;
+                    processDetailsContainer.classList.add('fade-in');
+                    setTimeout(() => processDetailsContainer.classList.remove('fade-in'), 500);
+                });
+            });
+
+            const ctx = document.getElementById('paintCompositionChart').getContext('2d');
+            const paintCompositionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aglutinantes', 'Solventes', 'Pigmentos', 'Aditivos'],
+                    datasets: [{
+                        label: 'Composição Típica',
+                        data: [45, 30, 20, 5],
+                        backgroundColor: [
+                            '#81C784',
+                            '#64B5F6',
+                            '#E57373',
+                            '#FFD54F'
+                        ],
+                        borderColor: '#FDFBF8',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Inter'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            const brandsContainer = document.getElementById('brands-container');
+            contentData.brands.forEach(brand => {
+                const brandCard = `
+                    <div class="card-brand bg-white p-6 rounded-lg shadow-md border-l-4 ${brand.logoColor}">
+                        <h3 class="font-bold text-2xl mb-3">${brand.name}</h3>
+                        <p class="text-gray-600 text-sm">${brand.history}</p>
+                    </div>
+                `;
+                brandsContainer.innerHTML += brandCard;
+            });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            const navLinks = document.querySelectorAll('header .nav-link');
+            const sections = document.querySelectorAll('main section[id]');
+
+            function changeNav() {
+                let index = sections.length;
+            
+                while(--index && window.scrollY + 100 < sections[index].offsetTop) {}
+                
+                navLinks.forEach((link) => {
+                    link.classList.remove('active-nav');
+                });
+                
+                const activeDesktopLink = document.querySelector(`header .hidden a[href="#${sections[index].id}"]`);
+                if (activeDesktopLink) {
+                    activeDesktopLink.classList.add('active-nav');
+                }
+
+                const activeMobileLink = document.querySelector(`#mobile-menu a[href="#${sections[index].id}"]`);
+                if (activeMobileLink) {
+                    activeMobileLink.classList.add('active-nav');
+                }
+            }
+            
+            changeNav();
+            window.addEventListener('scroll', changeNav);
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    mobileMenu.classList.add('hidden');
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
